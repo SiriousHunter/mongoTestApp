@@ -11,7 +11,7 @@ var secondDataSet =  fs.readFileSync(__dirname + "/sources/second.json").toStrin
     try {
         await first.remove()
         await second.remove()
-        await third.remove()
+       
 
         //STEP #2
         await first.insertMany(JSON.parse(firstDataSet), { upsert: true })
@@ -42,7 +42,15 @@ var secondDataSet =  fs.readFileSync(__dirname + "/sources/second.json").toStrin
             },
             { $addFields:
                 {
-                    studentsDiff: { $subtract: [{ $arrayElemAt: ["$students.number", { $indexOfArray: ["$students.year", { $max: "$students.year" }] }] }, { $arrayElemAt: ["$seconds.overallStudents", 0] } ]}
+                    studentsDiff: {
+                        $let: {
+                            vars: {
+                                diff: { $max: "$students" }
+                            },
+                            in: { $subtract: ["$$diff.number", { $arrayElemAt: ["$seconds.overallStudents", 0] }]}
+                        }
+                            
+                    }    
                 }
             },
             { $project: { "seconds": 0 } },
