@@ -2,7 +2,7 @@
   "name": "nodejs-test-app",
   "version": "0.0.0",
   "description": "NodejsTestApp",
-  "main": "server.js",
+  "main": "app.js",
   "author": {
     "name": ""
   },
