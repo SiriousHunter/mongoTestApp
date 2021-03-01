@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-test-app",
+  "version": "0.0.0",
+  "description": "NodejsTestApp",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "mongoose": "^5.11.18"
+  }
+}
