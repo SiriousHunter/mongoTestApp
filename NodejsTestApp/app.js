@@ -19,54 +19,43 @@ var secondDataSet =  fs.readFileSync(__dirname + "/sources/second.json").toStrin
 
         //STEP #3
         await first.aggregate([
-            { $addFields:
-                {
-                    longitude: { $arrayElemAt: ["$location.ll", 0] },
-                    latitude: { $arrayElemAt: ["$location.ll", 1] }
-                }
-            },
-            { $replaceWith: "$$ROOT" },
-            { $out: "firsts" }
-            
-        ])
-
-        //STEP #4
-        await first.aggregate([
-            { $lookup:
+            {
+                $lookup:
                 {
                     from: "seconds",
-                    localField: "country",    
-                    foreignField: "country",  
+                    localField: "country",
+                    foreignField: "country",
                     as: "seconds"
                 }
             },
-            { $addFields:
+            {
+                $addFields:
                 {
+                    
                     studentsDiff: {
                         $let: {
                             vars: {
                                 diff: { $max: "$students" }
                             },
-                            in: { $subtract: ["$$diff.number", { $arrayElemAt: ["$seconds.overallStudents", 0] }]}
+                            in: { $subtract: ["$$diff.number", { $arrayElemAt: ["$seconds.overallStudents", 0] }] }
                         }
-                            
-                    }    
+
+                    },
+                    longitude: { $arrayElemAt: ["$location.ll", 0] },
+                    latitude: { $arrayElemAt: ["$location.ll", 1] }
                 }
             },
+            { $replaceWith: "$$ROOT" },
             { $project: { "seconds": 0 } },
-            { $out: "firsts" }
-        ])
-
-        //STEPs #5,6
-        await first.aggregate([
-            { $group:
-               {
+            {
+                $group:
+                {
                     _id: "$country",
                     allDiffs: { $push: "$studentsDiff" },
                     count: { $sum: 1 },
                     longitude: { $push: "$longitude" },
                     latitude: { $push: "$latitude" },
-               }
+                }
             },
             { $out: "third" }
         ])
